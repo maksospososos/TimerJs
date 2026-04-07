@@ -1,19 +1,39 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Таймер</title>
-</head>
-<body>
+let taskInput = document.getElementById('taskInput');
+let addBtn = document.getElementById('addBtn');
+let taskList = document.getElementById('taskList');
 
-    <form id="timerForm">
-        <input type="number" id="timeInput" placeholder="Введите минуты">
-        <button type="submit">Старт</button>
-    </form>
+// Запускаем отрисовку сразу
+renderTasks();
 
-    <div id="timerr">00:00:00</div>
+addBtn.addEventListener('click', function() {
+    let text = taskInput.value.trim();
+    if (!text) return;
 
-    <button id="delete">Сброс</button>
+    let timestamp = Date.now();
+    
+    // Получаем старые задачи или создаем пустой массив, если их нет
+    let storedData = localStorage.getItem('myTasks');
+    let tasks = storedData ? JSON.parse(storedData) : [];
+    
+    tasks.push({ text, timestamp });
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
 
-</body>
-</html>
+    taskInput.value = '';
+    renderTasks();
+});
+
+function renderTasks() {
+    let storedData = localStorage.getItem('myTasks');
+    let tasks = storedData ? JSON.parse(storedData) : [];
+    
+    taskList.innerHTML = '';
+
+    tasks.forEach(task => {
+        let date = new Date(task.timestamp);
+        let timeStr = date.toLocaleTimeString('ru-RU');
+        
+        let li = document.createElement('li');
+        li.textContent = `${task.text} — Сделано в ${timeStr}`;
+        taskList.appendChild(li);
+    });
+}
